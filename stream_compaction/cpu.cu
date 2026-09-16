@@ -12,6 +12,11 @@ namespace StreamCompaction {
             return timer;
         }
 
+        inline void exclusivePrefixSum(int n, int* odata, const int* idata) {
+            odata[0] = 0;
+            for (int i = 1; i < n; ++i) odata[i] = odata[i - 1] + idata[i - 1];
+        }
+
         /**
          * CPU scan (prefix sum).
          * For performance analysis, this is supposed to be a simple for loop.
@@ -19,7 +24,7 @@ namespace StreamCompaction {
          */
         void scan(int n, int *odata, const int *idata) {
             timer().startCpuTimer();
-            // TODO
+            exclusivePrefixSum(n, odata, idata);
             timer().endCpuTimer();
         }
 
@@ -30,9 +35,12 @@ namespace StreamCompaction {
          */
         int compactWithoutScan(int n, int *odata, const int *idata) {
             timer().startCpuTimer();
-            // TODO
+            int count = 0;
+            for (int i = 0; i < n; ++i)
+                if (idata[i] != 0)
+                    odata[count++] = idata[i];
             timer().endCpuTimer();
-            return -1;
+            return count;
         }
 
         /**
@@ -42,9 +50,18 @@ namespace StreamCompaction {
          */
         int compactWithScan(int n, int *odata, const int *idata) {
             timer().startCpuTimer();
-            // TODO
+            int* bools = new int[n];
+            int* indices = new int[n];
+            for (int i = 0; i < n; ++i) bools[i] = idata[i] != 0 ? 1 : 0;
+            exclusivePrefixSum(n, indices, bools);
+            for (int i = 0; i < n; ++i)
+                if (bools[i] == 1)
+                    odata[indices[i]] = idata[i];
+            int count = n > 0 ? indices[n - 1] + bools[n - 1] : 0;
+            delete[] bools;
+            delete[] indices;
             timer().endCpuTimer();
-            return -1;
+            return count;
         }
     }
 }
