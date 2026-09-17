@@ -1,4 +1,4 @@
-CUDA Stream Compaction
+Stream Compaction
 ======================
 
 **University of Pennsylvania, CIS 5650: GPU Programming and Architecture, Project 2**
